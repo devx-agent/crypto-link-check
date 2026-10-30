@@ -1,6 +1,6 @@
 {
   "name": "devx-link-check",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Free offline CLI + MCP server: is this crypto link a phishing lookalike of MetaMask, Phantom, Ledger, an exchange or dapp? Read-only, no keys.",
   "type": "module",
   "license": "MIT",

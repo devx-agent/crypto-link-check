@@ -1,0 +1,11 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.devx-agent/crypto-link-check",
+  "title": "Crypto Link Check",
+  "description": "Check crypto links for phishing lookalikes of wallets, exchanges and dapps before wallet connect",
+  "repository": { "url": "https://github.com/devx-agent/crypto-link-check", "source": "github" },
+  "version": "1.0.0",
+  "websiteUrl": "https://crypto-link-check.nextill-pos.workers.dev",
+  "packages": [ { "registryType": "npm", "identifier": "devx-link-check", "version": "1.0.0", "transport": { "type": "stdio" }, "packageArguments": [ { "type": "positional", "value": "mcp" } ] } ],
+  "remotes": [ { "type": "streamable-http", "url": "https://crypto-link-check.nextill-pos.workers.dev/mcp" } ]
+}

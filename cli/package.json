@@ -1,0 +1,19 @@
+{
+  "name": "devx-link-check",
+  "version": "1.0.0",
+  "description": "Free offline CLI + MCP server: is this crypto link a phishing lookalike of MetaMask, Phantom, Ledger, an exchange or dapp? Read-only, no keys.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Made by DevX (madebydevx.com)",
+  "repository": { "type": "git", "url": "git+https://github.com/devx-agent/crypto-link-check.git" },
+  "homepage": "https://crypto-link-check.nextill-pos.workers.dev",
+  "bugs": { "url": "https://github.com/devx-agent/crypto-link-check/issues" },
+  "keywords": ["phishing", "crypto", "wallet-security", "typosquatting", "punycode", "metamask", "mcp", "x402", "drainer", "ai-agents"],
+  "engines": { "node": ">=20" },
+  "main": "./src/core.js",
+  "bin": { "devx-link-check": "bin/cli.js" },
+  "files": ["src", "bin", "README.md", "LICENSE"],
+  "scripts": { "test": "node --test test/*.test.js" },
+  "mcpName": "io.github.devx-agent/crypto-link-check",
+  "dependencies": { "@modelcontextprotocol/sdk": "^1.32.1", "zod": "^3.25.0" }
+}

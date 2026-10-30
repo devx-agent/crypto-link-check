@@ -66,7 +66,7 @@ export default {
     if (p === "/.well-known/x402") return J({ version: 1, resources: [origin + ROUTE], description: SERVICE });
     if (p === "/.well-known/x402.json") return J({ x402Version: 2, name: SERVICE, provider: "Made by DevX (madebydevx.com)", resources: [{ url: origin + ROUTE, method: "GET", description: DESC, accepts: [requirements()] }] });
     if (p === "/mcp") return mcp(req, origin);
-    if (p === "/.well-known/mcp.json" || p === "/.well-known/mcp/server-card.json") return J({ name: "devx-crypto-link-check", description: "Crypto phishing / brand-impersonation link check for agents", url: origin + "/mcp", transport: "streamable-http", tools: ["check_crypto_link", "full_report_info"], provider: "Made by DevX" });
+    if (p === "/.well-known/mcp.json" || p === "/.well-known/mcp/server-card.json") return J({ name: "devx-crypto-link-check", description: "Crypto phishing / brand-impersonation link check for agents", url: origin + "/mcp", transport: "streamable-http", tools: ["check_crypto_link", "full_report_info"], provider: "Made by DevX", repository: "https://github.com/devx-agent/crypto-link-check", npm: "devx-link-check" });
     if (p === "/health") return J({ ok: true, version: VERSION });
     if (p === "/api/basic") {
       const r = lexical(url.searchParams.get("url") || ""); if (r.error) return J({ error: r.error }, 400);

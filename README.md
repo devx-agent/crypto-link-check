@@ -56,3 +56,8 @@ Verdicts: `official`, `no_red_flags`, `caution`, `suspicious`, `dangerous`. Same
 - `worker/`: the Cloudflare Worker behind the hosted API
 
 MIT. Made by [DevX](https://madebydevx.com). Contact madebydevx@gmail.com.
+
+## Guide
+
+- [How to spot fake crypto links](https://crypto-link-check.nextill-pos.workers.dev/how-to-spot-fake-crypto-links)
+- Related free tool: [7702 Sweeper Check](https://sweeper-check.nextill-pos.workers.dev/) — is a sweeper on your wallet?

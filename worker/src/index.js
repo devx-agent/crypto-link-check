@@ -1,6 +1,7 @@
 import { lexical, full } from "./core.js";
 import { BRANDS } from "./brands.js";
 import PAGE from "./page.html";
+import EXPLAINER from "./explainer.html";
 import { mcp } from "./mcp.js";
 
 const VERSION = "1.0.0";
@@ -19,10 +20,12 @@ const EX_URL = "https://metamask-wallet-sync.vercel.app/restore";
 const EXAMPLE = { url: EX_URL, verdict: "dangerous", impersonation_suspect: "metamask", findings: [{ level: "warn", code: "brand_in_hostname" }, { level: "danger", code: "free_hosting" }, { level: "warn", code: "bait_keyword" }], domain: { age_days: null }, page: { seed_phrase_wording: true }, advice: "..." };
 
 function requirements() { return { scheme: "exact", network: "eip155:8453", amount: PRICE, asset: USDC_BASE, payTo: PAY_TO, maxTimeoutSeconds: 120, extra: { name: "USD Coin", version: "2" } }; }
-function paymentRequired(origin, error) {
+function advertised(resUrl) { return { ...requirements(), maxAmountRequired: PRICE, resource: resUrl, description: DESC, mimeType: "application/json" }; }
+function paymentRequired(origin, error, resUrl) {
+  resUrl = resUrl || origin + ROUTE;
   return { x402Version: 2, error: error || "PAYMENT-SIGNATURE header is required",
-    resource: { url: origin + ROUTE, description: DESC, mimeType: "application/json", serviceName: SERVICE, tags: ["security", "phishing", "wallet", "agents", "x402", "url-check"] },
-    accepts: [requirements()],
+    resource: { url: resUrl, description: DESC, mimeType: "application/json", serviceName: SERVICE, tags: ["security", "phishing", "wallet", "agents", "x402", "url-check"] },
+    accepts: [advertised(resUrl)],
     extensions: { bazaar: { info: { input: { type: "http", method: "GET", queryParams: { url: EX_URL } }, output: { type: "json", example: EXAMPLE } },
       schema: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", properties: { input: { type: "object", properties: { type: { type: "string", const: "http" }, method: { type: "string", enum: ["GET"] }, queryParams: { type: "object", properties: { url: { type: "string", description: "URL or domain to check; repeat the url parameter for up to 10" } }, required: ["url"] } }, required: ["type", "method"] }, output: { type: "object" } }, required: ["input"] } } } };
 }
@@ -60,9 +63,24 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { headers: { ...H, "access-control-allow-headers": "*", "access-control-allow-methods": "GET, HEAD, POST, OPTIONS" } });
     if (p === "/") return new Response(PAGE.replaceAll("__PAYTO__", PAY_TO), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
     if (p === "/index.json") return J({ service: SERVICE, version: VERSION, by: "Made by DevX (madebydevx.com)", free: origin + "/api/basic?url=...", paid: origin + ROUTE + "?url=...", price_usdc: 0.005, protocol: "x402 v2 exact, USDC on Base", payTo: PAY_TO, mcp: origin + "/mcp", docs: origin + "/openapi.json", terms: origin + "/terms", description: DESC });
+    if (p === "/how-to-spot-fake-crypto-links" || p === "/how-to-spot-fake-crypto-links/") return new Response(EXPLAINER, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+    if (p === "/robots.txt") return new Response("User-agent: *\nAllow: /\nSitemap: https://crypto-link-check.nextill-pos.workers.dev/sitemap.xml\n", { headers: { "content-type": "text/plain" } });
+    if (p === "/sitemap.xml") return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://crypto-link-check.nextill-pos.workers.dev/</loc><lastmod>2026-10-30</lastmod></url><url><loc>https://crypto-link-check.nextill-pos.workers.dev/how-to-spot-fake-crypto-links</loc><lastmod>2026-10-30</lastmod></url></urlset>', { headers: { "content-type": "application/xml" } });
+    if (p === "/llms.txt") return new Response(`# DevX Crypto Link Check
+> Free check of crypto links for lookalike, typosquat and punycode domains of ~60 wallets, exchanges and dapps. Paid full check 0.005 USDC via x402 on Base.
+- Explainer: https://crypto-link-check.nextill-pos.workers.dev/how-to-spot-fake-crypto-links
+- Free API: GET /api/basic?url=...
+- Paid API (x402): GET /v1/check?url=...&url=...
+- MCP: https://crypto-link-check.nextill-pos.workers.dev/mcp
+- Brand list: /brands.json
+- OpenAPI: /openapi.json
+- Source: https://github.com/devx-agent/crypto-link-check
+- Related: https://sweeper-check.nextill-pos.workers.dev/what-is-an-eip-7702-sweeper
+`, { headers: { "content-type": "text/plain; charset=utf-8" } });
     if (p === "/terms") return new Response(TERMS, { headers: { "content-type": "text/plain; charset=utf-8", "access-control-allow-origin": "*" } });
     if (p === "/openapi.json") return J(docs(origin));
     if (p === "/brands.json") return J({ note: "Official domains we treat as genuine. Curated, not exhaustive. Corrections: madebydevx@gmail.com", brands: BRANDS });
+    if (p === "/.well-known/agent-tools-verify.txt") return new Response("atc_WoFrTiIYSQzNZmCO1Ws17ZrcxAmJkCNL\n", { headers: { "content-type": "text/plain" } });
     if (p === "/.well-known/x402") return J({ version: 1, resources: [origin + ROUTE], description: SERVICE });
     if (p === "/.well-known/x402.json") return J({ x402Version: 2, name: SERVICE, provider: "Made by DevX (madebydevx.com)", resources: [{ url: origin + ROUTE, method: "GET", description: DESC, accepts: [requirements()] }] });
     if (p === "/mcp") return mcp(req, origin);
@@ -74,7 +92,7 @@ export default {
     }
     if (p !== ROUTE) return J({ error: "not found", see: origin + "/index.json" }, 404);
     if (req.method !== "GET" && req.method !== "HEAD") return J({ error: "use GET" }, 405);
-    const pr = paymentRequired(origin);
+    const pr = paymentRequired(origin, null, origin + ROUTE + url.search);
     const parsed = parseUrls(url.searchParams);
     const sig = req.headers.get("PAYMENT-SIGNATURE") || req.headers.get("X-PAYMENT");
     if (!sig) return J(pr, 402, { "PAYMENT-REQUIRED": b64(pr) });
